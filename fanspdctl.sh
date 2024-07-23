@@ -31,15 +31,6 @@ version_info() {
     exit 0
 }
 
-# Root check
-ROOTUSER_NAME=root
-
-username=$(whoami)
-if [ "$username" != "$ROOTUSER_NAME" ]
-then
-    echo "You need to be root to run this script."
-    exit 1
-fi
 
 # Input
 
@@ -61,13 +52,22 @@ if [[ "$input" =~ ^(-)?[0-9]+$ ]]
           -v | --version) version_info ;;
         esac
       done
-        shift
+      shift
 fi
+
+# Root check
+ROOTUSER_NAME=root
+
+username=$(whoami)
+if [ "$username" != "$ROOTUSER_NAME" ]
+then
+    echo "You need to be root to run this script."
+    exit 1
+fi
+
 # Main
 
-
-
-echo $input > /sys/devices/platform/asus-nb-wmi/hwmon/hwmon[[:print:]]*/pwm1     # Set fan value (Value: 0-255)
+echo "$input" > /sys/devices/platform/asus-nb-wmi/hwmon/hwmon[[:print:]]*/pwm1     # Set fan value (Value: 0-255)
 # planned feature
 # echo 2 > /sys/devices/platform/asus-nb-wmi/hwmon/hwmon[[:print:]]*/pwm1_enable        # Change fan mode to automatic
 # echo 1 > /sys/devices/platform/asus-nb-wmi/hwmon/hwmon[[:print:]]*/pwm1_enable        # Change fan mode to manual
@@ -76,7 +76,6 @@ echo $input > /sys/devices/platform/asus-nb-wmi/hwmon/hwmon[[:print:]]*/pwm1    
 # Output
 current_fan_spd=$(</sys/devices/platform/asus-nb-wmi/hwmon/hwmon[[:print:]]*/pwm1)
 echo "Current fan speed is $current_fan_spd"
-echo "Program Done"
 exit 0
 
 
