@@ -21,19 +21,30 @@ help_info() {
       -h, --help
         Show this help message and exit
       -m, --mode #planned
-        Change fan mode {auto, manual, performance} #planned
+        Change fan mode {auto, manual, performance}
       -p, --percentage (experimental)
         Change input into percentage (%%)
-      -s, --status #planned
-        Show fan current speed
+      -s, --status
+        Show fan current speed and exit
       -v, --version
-        Show the version of the script
-    \n" "${0##*/}" "${0##*/}"
+        Show the version of the script adn exit
+
+    Example:
+    %s 255
+    %s -p 50
+    %s -m auto
+    \n" "${0##*/}" "${0##*/}" "${0##*/}" "${0##*/}" "${0##*/}"
     exit 0
 }
 
 version_info() {
     printf "%s\n" "$version_number"
+    exit 0
+}
+
+status_info() {
+    current_fan_spd=$(</sys/devices/platform/asus-nb-wmi/hwmon/hwmon[[:print:]]*/pwm1)
+    echo "The Current fan speed is $current_fan_spd"
     exit 0
 }
 
@@ -55,12 +66,13 @@ if [[ "$input" =~ ^(-)?[0-9]+$ ]]
           -h | --help) help_info ;;
           # -m | --mode)
           -p | --percentage) number2percentage ;;
-          # -s | --status)
+          -s | --status) status_info ;;
           -v | --version) version_info ;;
         esac
       done
       shift
 fi
+
 
 # Root check
 ROOTUSER_NAME=root
@@ -80,9 +92,7 @@ echo "$input" > /sys/devices/platform/asus-nb-wmi/hwmon/hwmon[[:print:]]*/pwm1  
 # echo 0 > /sys/devices/platform/asus-nb-wmi/hwmon/hwmon[[:print:]]*/pwm1_enable        # Change fan mode to full speed (buggy in some device)
 
 # Output
-current_fan_spd=$(</sys/devices/platform/asus-nb-wmi/hwmon/hwmon[[:print:]]*/pwm1)
-echo "The Current fan speed is $current_fan_spd"
-exit 0
+status_info ;
 
 
 # License
