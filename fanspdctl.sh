@@ -1,9 +1,14 @@
 #!/usr/bin/env bash
 # A Simple Fan Speed Control Script for ASUS Laptop by ZanDev
 
-version_number="0.0.2"
+version_number="0.0.3"
 
 # UI
+
+number2percentage() {
+    input=$(("$input2" * 255 / 100))
+    unset -v input2
+}
 
 help_info() {
     printf "
@@ -11,12 +16,13 @@ help_info() {
     %s [query]
     %s [options] [query]
 
+
     Options:
       -h, --help
         Show this help message and exit
       -m, --mode #planned
         Change fan mode {auto, manual, performance} #planned
-      -p, --percentage #planned
+      -p, --percentage (experimental)
         Change input into percentage (%%)
       -s, --status #planned
         Show fan current speed
@@ -35,6 +41,7 @@ version_info() {
 # Input
 
 input=$1
+input2=$2
 if [[ "$input" =~ ^(-)?[0-9]+$ ]]
   then
     if [[ $input -gt 255 || $input == -* ]]
@@ -46,9 +53,9 @@ if [[ "$input" =~ ^(-)?[0-9]+$ ]]
     while [ $# -gt 0 ]; do
       case  "$1" in
           -h | --help) help_info ;;
-          # -m | --mode
-          # -p | --percentage
-          # -s | --status
+          # -m | --mode)
+          -p | --percentage) number2percentage ;;
+          # -s | --status)
           -v | --version) version_info ;;
         esac
       done
@@ -59,8 +66,7 @@ fi
 ROOTUSER_NAME=root
 
 username=$(whoami)
-if [ "$username" != "$ROOTUSER_NAME" ]
-then
+if [ "$username" != "$ROOTUSER_NAME" ]; then
     echo "You need to be root to run this script."
     exit 1
 fi
@@ -75,7 +81,7 @@ echo "$input" > /sys/devices/platform/asus-nb-wmi/hwmon/hwmon[[:print:]]*/pwm1  
 
 # Output
 current_fan_spd=$(</sys/devices/platform/asus-nb-wmi/hwmon/hwmon[[:print:]]*/pwm1)
-echo "Current fan speed is $current_fan_spd"
+echo "The Current fan speed is $current_fan_spd"
 exit 0
 
 
