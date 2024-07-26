@@ -13,6 +13,11 @@ sudo cp AsusFanControl-CLI/fanspdctl /usr/local/bin
 rm -rf AsusFanControl-CLI
 ```
 
+### Uninstall
+```sh
+sudo rm "/usr/local/bin/fanspdctl"
+```
+
 ### dependencies
 - Bash
 - That all ᗜ˰ᗜ
