@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # A Simple Fan Speed Control Script for ASUS Laptop by ZanDev
 
-version_number="0.0.3"
+version_number="0.0.4"
 
 # UI
 
@@ -32,8 +32,10 @@ help_info() {
     Example:
     %s 255
     %s -p 50
-    %s -m auto
-    \n" "${0##*/}" "${0##*/}" "${0##*/}" "${0##*/}" "${0##*/}"
+    %s -m auto 
+    %s -m performance (may buggy in some device)
+
+    \n" "${0##*/}" "${0##*/}" "${0##*/}" "${0##*/}" "${0##*/}" "${0##*/}"
     exit 0
 }
 
@@ -48,6 +50,22 @@ status_info() {
     exit 0
 }
 
+fanmode() {
+    case "$input2" in 
+      auto) 
+        echo 2 > /sys/devices/platform/asus-nb-wmi/hwmon/hwmon[[:print:]]*/pwm1_enable 
+        echo "switching fan mode to automatic"
+        ;;
+      manual) 
+        echo 1 > /sys/devices/platform/asus-nb-wmi/hwmon/hwmon[[:print:]]*/pwm1_enable 
+        echo "switching fan mode to manual"
+        ;;
+      performance) 
+        echo 0 > /sys/devices/platform/asus-nb-wmi/hwmon/hwmon[[:print:]]*/pwm1_enable 
+        echo "switching fan mode to full speed"
+        ;;
+      esac
+}
 
 # Input
 
@@ -64,13 +82,13 @@ if [[ "$input" =~ ^(-)?[0-9]+$ ]]
     while [ $# -gt 0 ]; do
       case  "$1" in
           -h | --help) help_info ;;
-          # -m | --mode)
+          -m | --mode) fanmode ;;
           -p | --percentage) number2percentage ;;
           -s | --status) status_info ;;
           -v | --version) version_info ;;
         esac
-      done
       shift
+    done
 fi
 
 
